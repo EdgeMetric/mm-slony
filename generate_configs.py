@@ -1,7 +1,7 @@
 from jinja2 import FileSystemLoader, Environment
 import os
-from const import settings, Constant
-from utils import get_table_schema, get_sequences
+from slonik.const import settings, Constant
+from slonik.utils import get_table_schema, get_sequences
 
 
 def main():
