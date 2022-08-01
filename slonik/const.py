@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     
 
     class Config:
-        env_file: str = 'config.ini'
+        env_file: str = f'{os.path.dirname(os.path.realpath(__file__))}/config.ini'
         env_file_encoding: str = 'utf-8'
         
 settings = Settings()
