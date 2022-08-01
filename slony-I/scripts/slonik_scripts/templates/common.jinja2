@@ -1,0 +1,4 @@
+cluster name = {{CLUSTERNAME}};
+
+node 1 admin conninfo ='dbname={{REPLICATIONDB}} host={{MASTERHOST}} user={{MASTERUSER}} password={{MASTERPWD}}';
+node 2 admin conninfo ='dbname={{REPLICATIONDB}} host={{SLAVEHOST}} user={{SLAVEUSER}} password={{SLAVEPWD}}';

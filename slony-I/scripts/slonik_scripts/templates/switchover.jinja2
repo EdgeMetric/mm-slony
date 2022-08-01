@@ -1,0 +1,6 @@
+{% include 'common.jinja2' %}
+
+lock set (id = 1, origin = 1);
+move set (id = 1, old origin = 1, new origin = 2);
+SYNC (ID=2);
+WAIT FOR EVENT ( ORIGIN=1, CONFIRMED=ALL, WAIT ON=1 );
