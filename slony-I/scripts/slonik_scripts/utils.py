@@ -2,7 +2,7 @@ import subprocess
 from typing import List, Tuple
 from const import settings
 
-def get_table_schema(db_name: str) -> List[Tuple(str, str)]:
+def get_table_schema(db_name: str) -> List[Tuple[str, str]]:
 
     table_names_fp = "/tmp/table_names"
 
@@ -30,7 +30,7 @@ def get_table_schema(db_name: str) -> List[Tuple(str, str)]:
     return table_seq_names
 
 
-def get_sequences(db_name: str) -> List[Tuple(str, str)]:
+def get_sequences(db_name: str) -> List[Tuple[str, str]]:
     seq_names_fp = "/tmp/seq_names"
 
     subprocess.run(
@@ -40,7 +40,7 @@ def get_sequences(db_name: str) -> List[Tuple(str, str)]:
             "-d",
             db_name,
             "-c",
-            f"COPY (SELECT  sequence_schema, sequence_name FROM information_schema.sequences where sequence_schema in ({settings.REPLICATIONSCHEMA})) TO '{seq_names_fp}'",
+            f"COPY (SELECT  sequence_schema, sequence_name FROM information_schema.sequences where sequence_schema in {settings.REPLICATIONSCHEMA}) TO '{seq_names_fp}'",
         ],
         capture_output=True,
     )

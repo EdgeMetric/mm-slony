@@ -1,9 +1,9 @@
-from typing import List
-from pydantic import BaseSettings
 import os
+from pydantic import BaseSettings
+
 class Settings(BaseSettings):
     REPLICATIONDB: str 
-    REPLICATIONSCHEMA: List[str]
+    REPLICATIONSCHEMA: str
     TABLEOWNER: str
     CLUSTER: str
 
