@@ -18,7 +18,7 @@ def main():
         master_cur=master_conn.cursor()
         slave_cur=slave_conn.cursor()
         
-        
+        mismatch_found = False
         for schema, table in schema_table_names:
             pg_query = f"select * from {schema}.{table} limit 100000"
             
@@ -30,6 +30,8 @@ def main():
             for master_record in master_records:
                 if master_record not in slave_records:
                     print(f'Mismatch found for {table}, master: {master_record} is not found')
+                    mismatch_found = True
+                    break
                     
         for schema, sequence in schema_seq_names:
             pg_query = f"select * from {schema}.{sequence} limit 100000"
@@ -42,9 +44,11 @@ def main():
             for master_record in master_records:
                 if master_record not in slave_records:
                     print(f'Mismatch found for {sequence}, master: {master_record} is not found')
-                    
-                    
-        print(f'No mismatch found!')
+                    mismatch_found = True
+                    break
+                
+        if not mismatch_found:        
+            print(f'No mismatch found!')
             
             
     except (Exception, psycopg2.Error) as error:
