@@ -1,6 +1,6 @@
 import subprocess
 from typing import List, Tuple
-from const import settings
+from slonik.const import settings
 
 def get_table_schema(db_name: str) -> List[Tuple[str, str]]:
 
