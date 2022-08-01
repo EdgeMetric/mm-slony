@@ -10,7 +10,7 @@ def main():
     schema_table_names = get_table_schema(db_name)
     schema_seq_names = get_sequences(db_name)
     cwd = os.getcwd()
-    templateLoader = FileSystemLoader(searchpath=f"{cwd}/templates")
+    templateLoader = FileSystemLoader(searchpath=f"{os.path.dirname(os.path.realpath(__file__))}/slonik/templates")
     templateEnv = Environment(loader=templateLoader)
 
     VAR_MAP = {
@@ -30,7 +30,7 @@ def main():
         template = templateEnv.get_template(template_file)
 
         outputText = template.render(VAR_MAP)
-        outputfp = f"{cwd}/slonik_config/{template_file.split('.')[0]}"
+        outputfp = f"{os.path.dirname(os.path.realpath(__file__))}/slonik_config/{template_file.split('.')[0]}"
         with open(outputfp, "w") as f:
             f.write(outputText)
 
