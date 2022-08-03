@@ -30,8 +30,6 @@ def get_table_schema(db_name: str) -> List[Tuple[str, str]]:
         table_name = table.split("\t")[1].strip()
         table_seq_names.append((seq_name, table_name))
 
-    os.remove(table_names_fp)
-
     return table_seq_names
 
 
@@ -58,8 +56,6 @@ def get_sequences(db_name: str) -> List[Tuple[str, str]]:
         sechma_name = seq.split("\t")[0].strip()
         sequence_name = seq.split("\t")[1].strip()
         schema_seq_names.append((sechma_name, sequence_name))
-
-    os.remove(seq_names_fp)
 
     return schema_seq_names
 
@@ -92,5 +88,4 @@ def get_primary_key(db_name: str, table_name: str) -> str:
     primary_key_read = open(table_primary_key_fp)
     primary_key = primary_key_read.readline()
 
-    os.remove(table_primary_key_fp)
     return primary_key
