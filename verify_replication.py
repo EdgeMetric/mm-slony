@@ -39,15 +39,17 @@ def main():
             master_records = master_cur.fetchall()
             slave_cur.execute(pg_query)
             slave_records = slave_cur.fetchall()
-
+            found_mismatch = False
             for master_record in master_records:
                 if master_record not in slave_records:
                     print(
                         f"Mismatch found for {table}, master: {master_record} is not found"
                     )
                     unmatched_tables+=1
-                else:
-                    matched_tables+=1
+                    found_mismatch = True
+                    break
+            if not found_mismatch:
+                matched_tables+=1
                     
         total_seq = len(schema_seq_names)
         matched_seq, unmatched_seq = 0, 0
