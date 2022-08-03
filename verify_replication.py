@@ -46,7 +46,8 @@ def main():
                     )
                     mismatch_found = True
                     break
-
+        total_seq = len(schema_seq_names)
+        matched_seq, unmatched_seq = 0, 0
         for schema, sequence in schema_seq_names:
             pg_query = f"select * from {schema}.{sequence} limit 100000"
 
@@ -96,7 +97,12 @@ def main():
                               \n master: {master_records}\
                               \n slave: {slave_records}"
                         )
+                        unmatched_seq+=1
+                    else:
+                        matched_seq+=1
                     break
+        
+        print(f'Out of {total_seq}, {matched_seq} got matched and {unmatched_seq} got unmatched')
 
         if not mismatch_found:
             print(f"No mismatch found!")
