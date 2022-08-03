@@ -78,7 +78,8 @@ def main():
 
             for tab_schema, table in schema_table_names:
                 primary_key = get_primary_key(db_name, table)
-                if tab_schema == schema and table + primary_key + "seq" == sequence:
+                assumed_seq_name = f'{table}_{primary_key}_seq'
+                if tab_schema == schema and assumed_seq_name == sequence:
                     master_pg_query = f"select * from {tab_schema}.{table} where {primary_key}={master_last_val}"
                     master_cur.execute(master_pg_query)
                     master_records = master_cur.fetchall()
@@ -91,6 +92,7 @@ def main():
                               \n master: {master_records}\
                               \n slave: {slave_records}"
                         )
+                    break
 
         if not mismatch_found:
             print(f"No mismatch found!")
