@@ -1,3 +1,4 @@
+import traceback
 import psycopg2
 
 from slonik.const import settings
@@ -102,6 +103,7 @@ def main():
 
     except (Exception, psycopg2.Error) as error:
         print("Error fetching data from PostgreSQL table", error)
+        print(traceback.format_exc())
 
     finally:
         if master_conn:
