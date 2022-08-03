@@ -79,10 +79,11 @@ def main():
             for tab_schema, table in schema_table_names:
                 primary_key = get_primary_key(db_name, table)
                 if tab_schema == schema and table + primary_key + "seq" == sequence:
-                    pg_query = f"select * from {tab_schema}.{table} order by {primary_key} desc limit 1"
-                    master_cur.execute(pg_query)
+                    master_pg_query = f"select * from {tab_schema}.{table} where {primary_key}={master_last_val}"
+                    master_cur.execute(master_pg_query)
                     master_records = master_cur.fetchall()
-                    slave_cur.execute(pg_query)
+                    slave_pg_query = f"select * from {tab_schema}.{table} where {primary_key}={slave_last_val}"
+                    slave_cur.execute(slave_pg_query)
                     slave_records = slave_cur.fetchall()
                     if master_records != slave_records:
                         print(
