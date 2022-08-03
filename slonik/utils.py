@@ -59,36 +59,6 @@ def get_sequences(db_name: str) -> List[Tuple[str, str]]:
     return schema_seq_names
 
 
-# def get_primary_key(db_name: str, table_name: str) -> str:
-#     table_primary_key_fp = "/tmp/primary_key"
-
-#     subprocess.run(
-#         [
-#             "psql",
-#             "-t",
-#             "-d",
-#             db_name,
-#             "-c",
-#             f"COPY (SELECT pg_attribute.attname \
-#                 FROM pg_index, pg_class, pg_attribute, pg_namespace \
-#                 WHERE \
-#                 pg_class.oid = '{table_name}'::regclass AND \
-#                 indrelid = pg_class.oid AND \
-#                 nspname = 'public' AND \
-#                 pg_class.relnamespace = pg_namespace.oid AND \
-#                 pg_attribute.attrelid = pg_class.oid AND \
-#                 pg_attribute.attnum = any(pg_index.indkey) \
-#                 AND indisprimary \
-#                 ) TO '{table_primary_key_fp}'",
-#         ],
-#         capture_output=True,
-#     )
-#     primary_key_read = open(table_primary_key_fp)
-#     primary_key = primary_key_read.readline()
-
-#     return primary_key.strip()
-
-
 def get_primary_key(cursor, table_name) -> str:
 
     pg_query = f"SELECT pg_attribute.attname \
