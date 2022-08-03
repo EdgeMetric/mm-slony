@@ -78,8 +78,8 @@ def verify_sequence_data(
         slave_cur.execute(pg_query)
         slave_record = slave_cur.fetchall()[0]
 
-        (seq_name, master_last_val, _) = master_record  # schema for sequences in pg 9.6
-        (slave_last_val, _) = slave_record  # schema for sequences in pg 14
+        (seq_name, master_last_val, *_) = master_record  # schema for sequences in pg 9.6
+        (slave_last_val, *_) = slave_record  # schema for sequences in pg 14
         if master_last_val != slave_last_val:
             print(
                 f"Mismatch found for {sequence}, \
