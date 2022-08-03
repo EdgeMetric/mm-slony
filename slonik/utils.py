@@ -2,6 +2,7 @@ import subprocess
 from typing import List, Tuple
 from slonik.const import settings
 
+
 def get_table_schema(db_name: str) -> List[Tuple[str, str]]:
 
     table_names_fp = "/tmp/table_names"

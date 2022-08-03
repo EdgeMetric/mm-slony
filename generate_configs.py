@@ -10,7 +10,9 @@ def main():
     schema_table_names = get_table_schema(db_name)
     schema_seq_names = get_sequences(db_name)
     cwd = os.getcwd()
-    templateLoader = FileSystemLoader(searchpath=f"{os.path.dirname(os.path.realpath(__file__))}/slonik/templates")
+    templateLoader = FileSystemLoader(
+        searchpath=f"{os.path.dirname(os.path.realpath(__file__))}/slonik/templates"
+    )
     templateEnv = Environment(loader=templateLoader)
 
     VAR_MAP = {
