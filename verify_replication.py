@@ -1,7 +1,7 @@
 import psycopg2
 
 from slonik.const import settings
-from slonik.utils import get_table_schema, get_sequences
+from slonik.utils import get_primary_key, get_table_schema, get_sequences
 
 
 def main():
@@ -75,24 +75,21 @@ def main():
                 print(
                     f"Mismatch found for {sequence}, master: {master_record} is not matched by slave {slave_record}"
                 )
-                break
-                
-            # Verify last value of the table
-            table_name = seq_name.split('_')[0]
-            primary_key = seq_name.split('_')[1]
-            pg_query = f"select * from {schema}.{table_name} order by {primary_key} desc limit 1"
-            
-            master_cur.execute(pg_query)
-            master_records = master_cur.fetchall()
-            slave_cur.execute(pg_query)
-            slave_records = slave_cur.fetchall()
-            
-            if master_records != slave_records:
-                print(
-                    f"Mismatch found for last value in sequence {sequence}, master: {master_record} is not matched by slave {slave_record}"
-                )
-                
-            
+
+            for tab_schema, table in schema_table_names:
+                primary_key = get_primary_key(db_name, table)
+                if tab_schema == schema and table + primary_key + "seq" == sequence:
+                    pg_query = f"select * from {tab_schema}.{table} order by {primary_key} desc limit 1"
+                    master_cur.execute(pg_query)
+                    master_records = master_cur.fetchall()
+                    slave_cur.execute(pg_query)
+                    slave_records = slave_cur.fetchall()
+                    if master_records != slave_records:
+                        print(
+                            f"Primary key do not match for table {table}-> \
+                              \n master: {master_records}\
+                              \n slave: {slave_records}"
+                        )
 
         if not mismatch_found:
             print(f"No mismatch found!")

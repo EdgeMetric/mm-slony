@@ -1,5 +1,7 @@
 import subprocess
+import os
 from typing import List, Tuple
+
 from slonik.const import settings
 
 
@@ -28,6 +30,8 @@ def get_table_schema(db_name: str) -> List[Tuple[str, str]]:
         table_name = table.split("\t")[1].strip()
         table_seq_names.append((seq_name, table_name))
 
+    os.remove(table_names_fp)
+
     return table_seq_names
 
 
@@ -55,4 +59,38 @@ def get_sequences(db_name: str) -> List[Tuple[str, str]]:
         sequence_name = seq.split("\t")[1].strip()
         schema_seq_names.append((sechma_name, sequence_name))
 
+    os.remove(seq_names_fp)
+
     return schema_seq_names
+
+
+def get_primary_key(db_name: str, table_name: str) -> str:
+    table_primary_key_fp = "/tmp/primary_key"
+
+    subprocess.run(
+        [
+            "psql",
+            "-t",
+            "-d",
+            db_name,
+            "-c",
+            f"COPY (SELECT \
+                pg_attribute.attname, \
+                FROM pg_index, pg_class, pg_attribute, pg_namespace \
+                WHERE\
+                pg_class.oid = '{table_name}'::regclass AND\
+                indrelid = pg_class.oid AND\
+                nspname = 'public' AND\
+                pg_class.relnamespace = pg_namespace.oid AND\
+                pg_attribute.attrelid = pg_class.oid AND\
+                pg_attribute.attnum = any(pg_index.indkey)\
+                AND indisprimary;\
+                ) TO '{table_primary_key_fp}'",
+        ],
+        capture_output=True,
+    )
+    primary_key_read = open(table_primary_key_fp)
+    primary_key = primary_key_read.readline()
+
+    os.remove(table_primary_key_fp)
+    return primary_key
