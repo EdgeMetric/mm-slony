@@ -46,7 +46,6 @@ def main():
                         f"Mismatch found for {table}, master: {master_record} is not found"
                     )
                     unmatched_tables+=1
-                    break
                 else:
                     matched_tables+=1
                     
