@@ -1,5 +1,4 @@
 import subprocess
-import os
 from typing import List, Tuple
 
 from slonik.const import settings
@@ -70,17 +69,16 @@ def get_primary_key(db_name: str, table_name: str) -> str:
             "-d",
             db_name,
             "-c",
-            f"COPY (SELECT \
-                pg_attribute.attname, \
+            f"COPY (SELECT pg_attribute.attname \
                 FROM pg_index, pg_class, pg_attribute, pg_namespace \
-                WHERE\
-                pg_class.oid = '{table_name}'::regclass AND\
-                indrelid = pg_class.oid AND\
-                nspname = 'public' AND\
-                pg_class.relnamespace = pg_namespace.oid AND\
-                pg_attribute.attrelid = pg_class.oid AND\
-                pg_attribute.attnum = any(pg_index.indkey)\
-                AND indisprimary;\
+                WHERE \
+                pg_class.oid = '{table_name}'::regclass AND \
+                indrelid = pg_class.oid AND \
+                nspname = 'public' AND \
+                pg_class.relnamespace = pg_namespace.oid AND \
+                pg_attribute.attrelid = pg_class.oid AND \
+                pg_attribute.attnum = any(pg_index.indkey) \
+                AND indisprimary \
                 ) TO '{table_primary_key_fp}'",
         ],
         capture_output=True,
