@@ -78,8 +78,8 @@ def main():
                 break
                 
             # Verify last value of the table
-            table_name = sequence.split('_')[0]
-            primary_key = sequence.split('_')[1]
+            table_name = seq_name.split('_')[0]
+            primary_key = seq_name.split('_')[1]
             pg_query = f"select * from {schema}.{table_name} order by {primary_key} desc limit 1"
             
             master_cur.execute(pg_query)
