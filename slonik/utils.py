@@ -90,7 +90,7 @@ def get_sequences(db_name: str) -> List[Tuple[str, str]]:
 
 
 def get_primary_key(cursor, table_name) -> str:
-    
+
     pg_query = f"SELECT pg_attribute.attname \
                 FROM pg_index, pg_class, pg_attribute, pg_namespace \
                 WHERE \
@@ -101,12 +101,12 @@ def get_primary_key(cursor, table_name) -> str:
                 pg_attribute.attrelid = pg_class.oid AND \
                 pg_attribute.attnum = any(pg_index.indkey) \
                 AND indisprimary"
-                
+
     cursor.execute(pg_query)
     records = cursor.fetchall()
     if len(records):
-        primary_key, = records[0]
+        (primary_key,) = records[0]
     else:
         primary_key = None
-    
+
     return primary_key

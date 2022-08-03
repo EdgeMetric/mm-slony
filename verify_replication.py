@@ -6,7 +6,9 @@ from slonik.const import settings
 from slonik.utils import get_primary_key, get_table_schema, get_sequences
 
 
-def verify_table_data(master_cur, slave_cur, schema_table_names)-> Tuple[int, int, int]:
+def verify_table_data(
+    master_cur, slave_cur, schema_table_names
+) -> Tuple[int, int, int]:
     total_tables = len(schema_table_names)
     matched_tables, unmatched_tables = 0, 0
     for schema, table in schema_table_names:
@@ -22,15 +24,18 @@ def verify_table_data(master_cur, slave_cur, schema_table_names)-> Tuple[int, in
                 print(
                     f"Mismatch found for {table}, master: {master_record} is not found"
                 )
-                unmatched_tables+=1
+                unmatched_tables += 1
                 found_mismatch = True
                 break
         if not found_mismatch:
-            matched_tables+=1
-            
+            matched_tables += 1
+
     return (total_tables, matched_tables, unmatched_tables)
 
-def verify_sequence_data(master_cur, slave_cur, schema_seq_names, schema_table_names)-> Tuple[int, int, int]:
+
+def verify_sequence_data(
+    master_cur, slave_cur, schema_seq_names, schema_table_names
+) -> Tuple[int, int, int]:
     total_seq = len(schema_seq_names)
     matched_seq, unmatched_seq = 0, 0
     for schema, sequence in schema_seq_names:
@@ -66,9 +71,9 @@ def verify_sequence_data(master_cur, slave_cur, schema_seq_names, schema_table_n
         for tab_schema, table in schema_table_names:
             if tab_schema != schema:
                 continue
-            
-            primary_key = get_primary_key(master_cur, f'{tab_schema}.{table}')
-            assumed_seq_name = f'{table}_{primary_key}_seq'
+
+            primary_key = get_primary_key(master_cur, f"{tab_schema}.{table}")
+            assumed_seq_name = f"{table}_{primary_key}_seq"
             if tab_schema == schema and assumed_seq_name == sequence:
                 master_pg_query = f"select * from {tab_schema}.{table} where {primary_key}={master_last_val}"
                 master_cur.execute(master_pg_query)
@@ -82,14 +87,14 @@ def verify_sequence_data(master_cur, slave_cur, schema_seq_names, schema_table_n
                         \n master: {master_records}\
                         \n slave: {slave_records}"
                     )
-                    unmatched_seq+=1
+                    unmatched_seq += 1
                 else:
-                    matched_seq+=1
-                    
+                    matched_seq += 1
+
                 break
-            
+
     return (total_seq, matched_seq, unmatched_seq)
-    
+
 
 def main():
 
@@ -116,11 +121,19 @@ def main():
         master_cur = master_conn.cursor()
         slave_cur = slave_conn.cursor()
 
-        total_tables, matched_tables, unmatched_tables = verify_table_data(master_cur, slave_cur, schema_table_names)
-        total_seq, matched_seq, unmatched_seq = verify_sequence_data(master_cur, slave_cur, schema_seq_names, schema_table_names)
-        
-        print(f'Out of {total_seq} sequences, {matched_seq} got matched and {unmatched_seq} got unmatched')
-        print(f'Out of {total_tables} tables, {matched_tables} got matched and {unmatched_tables} got unmatched')
+        total_tables, matched_tables, unmatched_tables = verify_table_data(
+            master_cur, slave_cur, schema_table_names
+        )
+        total_seq, matched_seq, unmatched_seq = verify_sequence_data(
+            master_cur, slave_cur, schema_seq_names, schema_table_names
+        )
+
+        print(
+            f"Out of {total_seq} sequences, {matched_seq} got matched and {unmatched_seq} got unmatched"
+        )
+        print(
+            f"Out of {total_tables} tables, {matched_tables} got matched and {unmatched_tables} got unmatched"
+        )
         if total_seq == matched_seq and total_tables == matched_tables:
             print(f"No mismatch found!")
 
