@@ -83,11 +83,11 @@ def main():
             pg_query = f"select * from {schema}.{table_name} order by {primary_key} desc limit 1"
             
             master_cur.execute(pg_query)
-            master_record = master_cur.fetchall()[0]
+            master_records = master_cur.fetchall()
             slave_cur.execute(pg_query)
-            slave_record = slave_cur.fetchall()[0]
+            slave_records = slave_cur.fetchall()
             
-            if master_record != slave_record:
+            if master_records != slave_records:
                 print(
                     f"Mismatch found for last value in sequence {sequence}, master: {master_record} is not matched by slave {slave_record}"
                 )
