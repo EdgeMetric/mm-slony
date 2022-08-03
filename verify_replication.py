@@ -1,8 +1,7 @@
-from jinja2 import FileSystemLoader, Environment
-import os
-from slonik.const import settings, Constant
-from slonik.utils import get_table_schema, get_sequences
 import psycopg2
+
+from slonik.const import settings
+from slonik.utils import get_table_schema, get_sequences
 
 
 def main():
@@ -37,20 +36,20 @@ def main():
             pg_query = f"select * from {schema}.{sequence} limit 100000"
             
             master_cur.execute(pg_query)
-            master_records = master_cur.fetchall()
+            master_record = master_cur.fetchall()[0]
             slave_cur.execute(pg_query)
-            slave_records = slave_cur.fetchall()
+            slave_record = slave_cur.fetchall()[0]
             
-            for master_record in master_records:
-                if master_record not in slave_records:
-                    print(f'Mismatch found for {sequence}, master: {master_record} is not found')
-                    mismatch_found = True
-                    break
+    
+            seq_name, master_last_val, start_val, inc_by, min_val, max_val, cache_val, master_log_cnt, is_cycled, master_is_called = master_record # schema for sequences in pg 9.6
+            slave_last_val, slave_log_cnt, slave_is_called = slave_record # schema for sequences in pg 14
+            if master_last_val != slave_last_val:
+                print(f'Mismatch found for {sequence}, master: {master_record} is not matched by slave {slave_record}')
                 
+
         if not mismatch_found:        
             print(f'No mismatch found!')
-            
-            
+                    
     except (Exception, psycopg2.Error) as error:
         print("Error fetching data from PostgreSQL table", error)
         
