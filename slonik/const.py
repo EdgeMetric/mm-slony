@@ -1,4 +1,5 @@
 import os
+from string import Template
 from pydantic import BaseSettings
 
 
@@ -34,3 +35,6 @@ class Constant:
         "replication.jinja2",
         "switchover.jinja2",
     ]
+    CONFIG_TEMPLATE_PATH = Template(
+        "os.path.dirname(os.path.realpath(__file__))}/slonik_config/$filename"
+    )
