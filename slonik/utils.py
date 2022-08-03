@@ -86,4 +86,4 @@ def get_primary_key(db_name: str, table_name: str) -> str:
     primary_key_read = open(table_primary_key_fp)
     primary_key = primary_key_read.readline()
 
-    return primary_key
+    return primary_key.strip()
