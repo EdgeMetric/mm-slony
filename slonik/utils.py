@@ -104,6 +104,9 @@ def get_primary_key(cursor, table_name) -> str:
                 
     cursor.execute(pg_query)
     records = cursor.fetchall()
-    primary_key, = records[0]
+    if len(records):
+        primary_key, = records[0]
+    else:
+        primary_key = None
     
     return primary_key
