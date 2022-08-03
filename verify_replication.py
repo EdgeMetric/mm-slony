@@ -77,7 +77,7 @@ def main():
                 )
 
             for tab_schema, table in schema_table_names:
-                primary_key = get_primary_key(master_cur, table)
+                primary_key = get_primary_key(master_cur, f'{schema}.{table}')
                 assumed_seq_name = f'{table}_{primary_key}_seq'
                 if tab_schema == schema and assumed_seq_name == sequence:
                     master_pg_query = f"select * from {tab_schema}.{table} where {primary_key}={master_last_val}"
