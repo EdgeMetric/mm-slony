@@ -30,7 +30,8 @@ def main():
         master_cur = master_conn.cursor()
         slave_cur = slave_conn.cursor()
 
-        mismatch_found = False
+        total_tables = len(schema_table_names)
+        matched_tables, unmatched_tables = 0, 0
         for schema, table in schema_table_names:
             pg_query = f"select * from {schema}.{table} limit 100000"
 
@@ -44,8 +45,11 @@ def main():
                     print(
                         f"Mismatch found for {table}, master: {master_record} is not found"
                     )
-                    mismatch_found = True
+                    unmatched_tables+=1
                     break
+                else:
+                    matched_tables+=1
+                    
         total_seq = len(schema_seq_names)
         matched_seq, unmatched_seq = 0, 0
         for schema, sequence in schema_seq_names:
@@ -102,9 +106,9 @@ def main():
                         matched_seq+=1
                     break
         
-        print(f'Out of {total_seq}, {matched_seq} got matched and {unmatched_seq} got unmatched')
-
-        if not mismatch_found:
+        print(f'Out of {total_seq} sequences, {matched_seq} got matched and {unmatched_seq} got unmatched')
+        print(f'Out of {total_tables} tables, {matched_tables} got matched and {unmatched_tables} got unmatched')
+        if total_seq == matched_seq and total_tables == matched_tables:
             print(f"No mismatch found!")
 
     except (Exception, psycopg2.Error) as error:
