@@ -1,62 +1,24 @@
-import subprocess
 from typing import List, Tuple
 
 from slonik.const import settings
+import psycopg2
 
 
-def get_table_schema(db_name: str) -> List[Tuple[str, str]]:
+def get_table_schema(cursor) -> List[Tuple[str, str]]:
 
-    table_names_fp = "/tmp/table_names"
-
-    subprocess.run(
-        [
-            "psql",
-            "-t",
-            "-d",
-            db_name,
-            "-c",
-            f"COPY (SELECT schemaname, tablename FROM pg_catalog.pg_tables where tableowner='{settings.TABLEOWNER}') TO '{table_names_fp}'",
-        ],
-        capture_output=True,
-    )
-
-    table_names_read = open(table_names_fp)
-    table_names = table_names_read.readlines()
-    table_seq_names = []
-
-    for table in table_names:
-        seq_name = table.split("\t")[0].strip()
-        table_name = table.split("\t")[1].strip()
-        table_seq_names.append((seq_name, table_name))
-
-    return table_seq_names
+    pg_query = f"SELECT schemaname, tablename \
+                FROM pg_catalog.pg_tables \
+                where tableowner='{settings.TABLEOWNER}'"
+    cursor.execute(pg_query)
+    return cursor.fetchall()
 
 
-def get_sequences(db_name: str) -> List[Tuple[str, str]]:
-    seq_names_fp = "/tmp/seq_names"
-
-    subprocess.run(
-        [
-            "psql",
-            "-t",
-            "-d",
-            db_name,
-            "-c",
-            f"COPY (SELECT  sequence_schema, sequence_name FROM information_schema.sequences where sequence_schema in {settings.REPLICATIONSCHEMA}) TO '{seq_names_fp}'",
-        ],
-        capture_output=True,
-    )
-
-    seq_names_read = open(seq_names_fp)
-    seq_names = seq_names_read.readlines()
-    schema_seq_names = []
-
-    for seq in seq_names:
-        sechma_name = seq.split("\t")[0].strip()
-        sequence_name = seq.split("\t")[1].strip()
-        schema_seq_names.append((sechma_name, sequence_name))
-
-    return schema_seq_names
+def get_sequences(cursor) -> List[Tuple[str, str]]:
+    pg_query = f"SELECT  sequence_schema, sequence_name \
+                FROM information_schema.sequences \
+                where sequence_schema in {settings.REPLICATIONSCHEMA}"
+    cursor.execute(pg_query)
+    return cursor.fetchall()
 
 
 def get_primary_key(cursor, table_name) -> str:
@@ -80,3 +42,28 @@ def get_primary_key(cursor, table_name) -> str:
         primary_key = None
 
     return primary_key
+
+
+def get_master_connection():
+    master_conn = psycopg2.connect(
+        dbname=settings.REPLICATIONDB,
+        user=settings.MASTERUSER,
+        password=settings.MASTERPWD,
+        host=settings.MASTERHOST,
+        port=settings.MASTERPORT,
+    )
+
+    return master_conn
+
+
+def get_slave_connection():
+
+    slave_conn = psycopg2.connect(
+        dbname=settings.REPLICATIONDB,
+        user=settings.SLAVEUSER,
+        password=settings.SLAVEPWD,
+        host=settings.SLAVEHOST,
+        port=settings.SLAVEPORT,
+    )
+
+    return slave_conn

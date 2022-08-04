@@ -2,6 +2,7 @@ import os
 from string import Template
 from pydantic import BaseSettings
 
+
 class Settings(BaseSettings):
     REPLICATIONDB: str
     REPLICATIONSCHEMA: str

@@ -6,7 +6,7 @@ import os
 
 from jinja2 import FileSystemLoader, Environment
 from slonik.const import settings, Constant
-from slonik.utils import get_table_schema, get_sequences
+from slonik.utils import get_master_connection, get_table_schema, get_sequences
 
 
 def main():
@@ -14,9 +14,12 @@ def main():
     Generate slonik configurations
     """
 
-    db_name = settings.REPLICATIONDB
-    schema_table_names = get_table_schema(db_name)
-    schema_seq_names = get_sequences(db_name)
+    master_conn = get_master_connection()
+    master_cur = master_conn.cursor()
+
+    schema_table_names = get_table_schema(master_cur)
+    schema_seq_names = get_sequences(master_cur)
+
     template_loader = FileSystemLoader(
         searchpath=f"{os.path.dirname(os.path.realpath(__file__))}/slonik/templates"
     )

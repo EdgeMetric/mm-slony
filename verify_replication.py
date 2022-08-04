@@ -7,8 +7,13 @@ import traceback
 from typing import Tuple
 import psycopg2
 
-from slonik.const import settings
-from slonik.utils import get_primary_key, get_table_schema, get_sequences
+from slonik.utils import (
+    get_master_connection,
+    get_primary_key,
+    get_slave_connection,
+    get_table_schema,
+    get_sequences,
+)
 
 
 def verify_table_data(
@@ -78,7 +83,11 @@ def verify_sequence_data(
         slave_cur.execute(pg_query)
         slave_record = slave_cur.fetchall()[0]
 
-        (seq_name, master_last_val, *_) = master_record  # schema for sequences in pg 9.6
+        (
+            seq_name,
+            master_last_val,
+            *_,
+        ) = master_record  # schema for sequences in pg 9.6
         (slave_last_val, *_) = slave_record  # schema for sequences in pg 14
         if master_last_val != slave_last_val:
             print(
@@ -122,28 +131,15 @@ def main():
     verifies if primary key sequence matches.
     """
 
-    db_name = settings.REPLICATIONDB
-
-    schema_table_names = get_table_schema(db_name)
-    schema_seq_names = get_sequences(db_name)
     try:
-        master_conn = psycopg2.connect(
-            dbname=db_name,
-            user=settings.MASTERUSER,
-            password=settings.MASTERPWD,
-            host=settings.MASTERHOST,
-            port=settings.MASTERPORT,
-        )
-        slave_conn = psycopg2.connect(
-            dbname=db_name,
-            user=settings.SLAVEUSER,
-            password=settings.SLAVEPWD,
-            host=settings.SLAVEHOST,
-            port=settings.SLAVEPORT,
-        )
 
+        master_conn = get_master_connection()
+        slave_conn = get_slave_connection()
         master_cur = master_conn.cursor()
         slave_cur = slave_conn.cursor()
+
+        schema_table_names = get_table_schema(master_cur)
+        schema_seq_names = get_sequences(master_cur)
 
         total_tables, matched_tables, unmatched_tables = verify_table_data(
             master_cur, slave_cur, schema_table_names
