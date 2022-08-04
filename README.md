@@ -21,7 +21,7 @@ Create a config.ini file in slonik/config.ini with the following values:
 Clone this repo in master instance. Ensure the postgresql is up and running and psql client is installed.
  
 
-## Installtion and usage
+## Installation and usage
 <ol>
 <li> Install dependencies in virtualenv. </li>
 
