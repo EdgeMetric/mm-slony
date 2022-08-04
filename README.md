@@ -57,6 +57,7 @@ where configuration_file_path is the path to the configuration file.
 
 ## Verify replication
 This is to be run post switchover
+
 Become a postgres user and run
 
 ```bash
