@@ -130,13 +130,12 @@ def main():
     Runs tests on master and slave tables and
     verifies if primary key sequence matches.
     """
+    master_conn = get_master_connection()
+    slave_conn = get_slave_connection()
+    master_cur = master_conn.cursor()
+    slave_cur = slave_conn.cursor()
 
     try:
-
-        master_conn = get_master_connection()
-        slave_conn = get_slave_connection()
-        master_cur = master_conn.cursor()
-        slave_cur = slave_conn.cursor()
 
         schema_table_names = get_table_schema(master_cur)
         schema_seq_names = get_sequences(master_cur)
