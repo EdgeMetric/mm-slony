@@ -36,5 +36,5 @@ class Constant:
         "switchover.jinja2",
     ]
     CONFIG_TEMPLATE_PATH = Template(
-        "os.path.dirname(os.path.realpath(__file__))}/slonik_config/$filename"
+        f"{os.path.dirname(os.path.realpath(__file__))}/slonik_config/$filename"
     )
