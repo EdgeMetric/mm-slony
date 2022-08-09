@@ -1,0 +1,3 @@
+Jinja2
+pydantic[dotenv]
+psycopg2-binary

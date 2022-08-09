@@ -1,0 +1,17 @@
+{% include 'common.jinja2' %}
+
+init cluster ( id=1, comment = 'Master Node');
+
+create set (id=1, origin=1, comment='replication set');
+
+{% for SCHEMA, TABLE in REPLICATIONTABLES%}
+set add table (set id=1, origin=1, id={{loop.index}}, fully qualified name = '{{SCHEMA}}.{{TABLE}}', comment='replicated table');
+{% endfor %}
+
+{% for SCHEMA, SEQUENCE in REPLICATIONSEQUENCE%}
+set add sequence (set id=1, origin=1, id={{loop.index}}, fully qualified name = '{{SCHEMA}}.{{SEQUENCE}}', comment='replicated sequence');
+{% endfor %}
+
+store node (id=2, comment ='Slave node', event node=1);
+store path (server = 1, client = 2, conninfo='dbname={{REPLICATIONDB}} host={{MASTERHOST}} user={{MASTERUSER}} password={{MASTERPWD}}');
+store path (server = 2, client = 1, conninfo='dbname={{REPLICATIONDB}} host={{SLAVEHOST}} user={{SLAVEUSER}} password={{SLAVEPWD}}');
